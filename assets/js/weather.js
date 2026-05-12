@@ -279,6 +279,27 @@
             });
         },
 
+        updateStars: function () {
+
+            var self = this;
+
+            this._stars.forEach(function (s) {
+
+                /* original position save */
+                if (s.baseX === undefined) {
+                    s.baseX = s.x;
+                    s.baseY = s.y;
+                }
+
+                /* smooth return */
+                s.x += (s.baseX - s.x) * 0.02;
+                s.y += (s.baseY - s.y) * 0.02;
+
+                /* mouse effect */
+                self.applyMouseEffect(s);
+            });
+        },
+
         /* =================================================
          * SHARED — REALISTIC SUN
          * ================================================= */
@@ -618,6 +639,7 @@
 
             /* Sky + celestial bodies */
             this.drawSkyGradient(h);
+            this.updateStars();
             this.drawStars(h);
             this.drawRealisticSun(h);
             this.drawRealisticMoon(h);
@@ -751,6 +773,7 @@
             var isDay = h >= 6 && h < 20;
 
             this.drawSkyGradient(h);
+            this.updateStars();
             this.drawStars(h);
             this.drawRealisticSun(h);
             this.drawRealisticMoon(h);
