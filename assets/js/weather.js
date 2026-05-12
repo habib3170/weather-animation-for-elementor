@@ -588,45 +588,84 @@
         },
 
         updateCloud: function () {
-            if (!this.cloudState) return;
-            var self    = this;
-            var density = parseInt(this.settings.density) || 14;
-            var speed   = parseFloat(this.settings.speed) || 1;
-            var W = this.canvas.width, H = this.canvas.height;
 
-            /* Move clouds + mouse effect */
+            if (!this.cloudState) return;
+
+            var self  = this;
+            var speed = parseFloat(this.settings.speed) || 1;
+
+            var W = this.canvas.width;
+            var H = this.canvas.height;
+
+            /* =================================================
+            * CLOUD MOVEMENT
+            * ================================================= */
             this.cloudState.clouds.forEach(function (c) {
+
+                /* Move cloud */
                 c.x += c.speed;
 
-                if (self.settings.mouse_effect === 'yes' && self.mouse.x !== null) {
-                    var cx   = c.x + c.w / 2;
-                    var cy   = c.y + c.h / 2;
-                    var dx   = self.mouse.x - cx;
-                    var dy   = self.mouse.y - cy;
+                /* =================================================
+                * MOUSE EFFECT
+                * ================================================= */
+                if (
+                    self.settings.mouse_effect === 'yes' &&
+                    self.mouse.x !== null &&
+                    self.mouse.y !== null
+                ) {
+
+                    var cx = c.x + c.w / 2;
+                    var cy = c.y + c.h / 2;
+
+                    var dx = self.mouse.x - cx;
+                    var dy = self.mouse.y - cy;
+
                     var dist = Math.sqrt(dx * dx + dy * dy);
+
                     if (dist < self.mouse.radius) {
+
                         var force = (self.mouse.radius - dist) / self.mouse.radius;
                         var angle = Math.atan2(dy, dx);
+
                         if (self.settings.mouse_effect_type === 'attract') {
+
                             c.x += Math.cos(angle) * force * 1.5;
                             c.y += Math.sin(angle) * force * 1.5;
+
                         } else {
+
                             c.x -= Math.cos(angle) * force * 4;
                             c.y -= Math.sin(angle) * force * 2;
                         }
                     }
                 }
+
+                /* =================================================
+                * WRAP AROUND
+                * ================================================= */
+
+                /* cloud fully left screen */
+                if (c.x > W + c.w) {
+
+                    /* send back to left */
+                    c.x = -c.w - Math.random() * 200;
+
+                    /* random vertical position */
+                    c.y = Math.random() * H * 0.5 + 20;
+                }
             });
 
-            /* Recycle off-screen clouds */
-            this.cloudState.clouds = this.cloudState.clouds.filter(function (c) { return c.x < W + c.w + 10; });
-            while (this.cloudState.clouds.length < density) this.cloudState.clouds.push(self.createCloudParticle(W, H, true));
-
-            /* Birds */
+            /* =================================================
+            * BIRDS
+            * ================================================= */
             this.cloudState.birds.forEach(function (b) {
-                b.x    += b.speed * speed * 0.5;
+
+                b.x += b.speed * speed * 0.5;
                 b.wing += 0.08;
-                if (b.x > W + 40) b.x = -40;
+
+                if (b.x > W + 40) {
+                    b.x = -40;
+                }
             });
         },
 
