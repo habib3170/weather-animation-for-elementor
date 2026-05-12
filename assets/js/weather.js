@@ -205,7 +205,14 @@
          * ================================================= */
         drawSkyGradient: function (h) {
             var ctx = this.ctx, W = this.canvas.width, H = this.canvas.height;
-            var g   = ctx.createLinearGradient(0, 0, 0, H);
+
+            if (this.settings.bg_color) {
+                ctx.fillStyle = this.settings.bg_color;
+                ctx.fillRect(0, 0, W, H);
+                return;
+            }
+
+            var g = ctx.createLinearGradient(0, 0, 0, H);
 
             if      (h >= 5  && h < 7)  { g.addColorStop(0, '#1a1a3a'); g.addColorStop(0.4, '#8B3A62'); g.addColorStop(0.7, '#E8833A'); g.addColorStop(1, '#F5C842'); }
             else if (h >= 7  && h < 9)  { g.addColorStop(0, '#5BA4D8'); g.addColorStop(0.5, '#8DC6F0'); g.addColorStop(1, '#FAE8A0'); }
@@ -281,7 +288,7 @@
             var W    = this.canvas.width, H = this.canvas.height;
             var prog = Math.max(0, Math.min(1, (h - 5) / 15));
             var sx   = prog * W;
-            var sy   = H * 0.82 - Math.sin(prog * Math.PI) * H * 0.60;
+            var sy   = H * 0.85 - Math.sin(prog * Math.PI) * H * 0.65;
             var elev = Math.sin(prog * Math.PI);
             var r    = 36;
             var rise = (h >= 5 && h < 9) || (h >= 17 && h < 20);
@@ -848,6 +855,8 @@
             this.element.removeEventListener('mouseleave', this.mouseLeaveHandler);
 
             if (this.canvas && this.canvas.parentNode) this.canvas.remove();
+
+            if (this.settings.bg_color) this.element.style.backgroundColor = '';
 
             this.rainState  = null;
             this.snowState  = null;
